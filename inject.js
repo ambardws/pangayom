@@ -1,28 +1,44 @@
-console.log("=== PANGAYOM INJECT ===")
+console.log("--- PANGAYOM INJECT ---")
 
+// 1. Tangkap Uncaught Exceptions (Error Javascript biasa)
 window.onerror = function (message, source, lineno, colno, error) {
-  console.log("Error captured in MAIN world:", message)
+  console.log("Error tertangkap Pangayom:", message)
   
   window.postMessage({
     type: "PANGAYOM_ERROR",
     payload: {
-      message,
-      source,
-      lineno,
-      colno,
-      stack: error?.stack
+      message: error?.stack || `${message} di baris ${lineno} (${source})`
     }
   }, "*")
 }
 
-const originalError = console.error
-console.error = function (...args) {
-  console.log("Console.error captured in MAIN world:", args)
-  
+// 2. Tangkap Promise Rejections (Error di Async/Await atau Axios/Fetch - ini yang terjadi di Nuxt Anda!)
+window.addEventListener('unhandledrejection', function(event) {
+  console.log("Promise Error tertangkap Pangayom:", event.reason)
+
   window.postMessage({
     type: "PANGAYOM_ERROR",
     payload: {
-      message: args.join(" ")
+      message: event.reason?.stack || event.reason?.message || String(event.reason)
+    }
+  }, "*")
+})
+
+// 3. Tangkap manual Console.error() (Peringatan merah bikinan Vue/Developer)
+const originalError = console.error
+console.error = function (...args) {
+  const errorStrings = args.map(arg => {
+    if (arg instanceof Error) return arg.stack || arg.message
+    if (typeof arg === 'object') {
+      try { return JSON.stringify(arg) } catch(e) { return String(arg) }
+    }
+    return String(arg)
+  })
+
+  window.postMessage({
+    type: "PANGAYOM_ERROR",
+    payload: {
+      message: errorStrings.join(" | ")
     }
   }, "*")
   

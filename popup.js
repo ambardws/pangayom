@@ -11,18 +11,54 @@ chrome.storage.local.get(["apiKey", "errors", "lastGeneratedErrorMsg", "lastExpl
   document.getElementById("apiKey").value = apiKey
 
   const errors = data.errors || []
+  const errorSelect = document.getElementById("errorSelect")
+  const errorDetail = document.getElementById("errorDetail")
+
+  // Kosongkan menu dropdown
+  errorSelect.innerHTML = ""
 
   if (errors.length > 0) {
+    // Isi Dropdown dengan semua error yang terjadi di tab ini
+    errors.forEach((err, index) => {
+      const option = document.createElement("option")
+      option.value = index
+      
+      const shortMsg = err.message ? err.message.substring(0, 50).replace(/\n/g, "") + "..." : "Unknown Error"
+      option.textContent = `Error [${index + 1}]: ${shortMsg}`
+      errorSelect.appendChild(option)
+    })
+
+    // Secara default, pilih error paling terakhir (terbaru)
+    errorSelect.value = errors.length - 1
     latestError = errors[errors.length - 1]
-    errorContainer.innerText = latestError.message || JSON.stringify(latestError)
+    errorDetail.innerText = latestError.message || JSON.stringify(latestError)
     
-    // CEK PENTING: Apakah hasil penjelasan AI terakhir adalah untuk error yang persis sama dengan sekarang?
+    // REAKTIF: Kalau user ganti Error dari dropdown, jalankan ini
+    errorSelect.addEventListener("change", (e) => {
+      const selectedIndex = parseInt(e.target.value)
+      latestError = errors[selectedIndex]
+      errorDetail.innerText = latestError.message || JSON.stringify(latestError)
+      
+      // Munculkan cache memori JIKA error yang dipilin identik dengan riwayat cache yang tersimpan
+      if (data.lastGeneratedErrorMsg === latestError.message && data.lastExplanation) {
+        document.getElementById("result").innerHTML = parseMarkdownToHtml(data.lastExplanation)
+      } else {
+        document.getElementById("result").innerHTML = "Belum ada penjelasan untuk baris error ini."
+      }
+    })
+
+    // Cek memori cache awal untuk opsi default
     if (data.lastGeneratedErrorMsg === latestError.message && data.lastExplanation) {
       document.getElementById("result").innerHTML = parseMarkdownToHtml(data.lastExplanation)
     }
   } else {
-    errorContainer.innerText = "No errors found"
-    // Hapus juga riwayat lama di tampilan kalau memang layar sudah di clear
+    // Jika tidak ada sama sekali
+    const emptyOption = document.createElement("option")
+    emptyOption.textContent = "Tidak ada jejak error"
+    errorSelect.appendChild(emptyOption)
+    errorSelect.disabled = true
+    
+    errorDetail.innerText = "Layar bersih!"
     document.getElementById("result").innerHTML = "Belum ada penjelasan."
   }
 })

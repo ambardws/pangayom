@@ -15,15 +15,18 @@ h3 {
   padding-bottom: 8px;
 }
 
-#errors {
+#errorDetail {
   background: #fff5f5;
   color: #c53030;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #feb2b2;
-  font-size: 13px;
-  margin-bottom: 15px;
-  word-break: break-all;
+  font-size: 12px;
+  margin-bottom: 12px;
+  word-break: break-word;
+  max-height: 80px;
+  overflow-y: auto;
+  font-family: Consolas, Monaco, "Courier New", monospace;
 }
 
 input {
