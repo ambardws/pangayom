@@ -25,7 +25,7 @@
 2. Masukkan **API Key** OpenRouter / Z.ai / penyedia endpoint LLM Anda lainnya, lalu klik **Simpan**.
 3. (Opsional) Jika Anda menggunakan penyedia khusus selain OpenRouter, Anda bisa mengganti letak URL Endpoint maupun merubah identitas string `model` di _source code_ `popup.js`.
 4. Silakan asyik _ngoding_. Saat tab website Anda menjerit menjatuhkan Uncaught Error di Inspector layarnya, tinggal tekan logo ekstensi ini saja dari pojok layar.
-5. Klik **"Explain with AI"**! (Atau bumbui dulu form Code Snippet-nya bila menginginkan keakuratan yang lebih mengerikan).
+5. Klik **"Explain with Pangayom"**! (Atau bumbui dulu form Code Snippet-nya bila menginginkan keakuratan yang lebih mengerikan).
 
 ## 📋 Info Teknis (*Under the Hood*)
 
